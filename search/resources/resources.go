@@ -11,8 +11,10 @@ import (
 func searchAudio(w http.ResponseWriter, r *http.Request) {
 	a := map[string]interface{}{}
 	if err := json.NewDecoder(r.Body).Decode(&a); err == nil {
+		/* Gets audio from the POST request */
 		if audio, ok := a["Audio"].(string); ok {
 			if title, err := service.Service(audio); err == nil {
+				/* Writing the audio id ouput and encoding to the response */
 				u := map[string]interface{}{"id": title}
 				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(u)

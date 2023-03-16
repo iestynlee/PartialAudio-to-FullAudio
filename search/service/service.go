@@ -15,30 +15,34 @@ const (
 func Service(mp3 string) (string, error) {
 	client := &http.Client{}
 
-	postBody, _ := json.Marshal(map[string]string{
+	/* JSON string converted into a byte array */
+	post, _ := json.Marshal(map[string]string{
 		"api_token": KEY,
 		"audio":     mp3,
 	})
 
-	responseBody := bytes.NewBuffer(postBody)
+	/* This will be added to the end of the URI*/
+	query := bytes.NewBuffer(post)
 
-	if req, err := http.NewRequest("POST", URI, responseBody); err == nil {
+	if req, err := http.NewRequest("POST", URI, query); err == nil {
 		if rsp, err := client.Do(req); err == nil {
 			defer rsp.Body.Close()
 			if rsp.StatusCode == http.StatusOK {
+				/* Decoding the response body into json*/
 				a := map[string]interface{}{}
 				if err := json.NewDecoder(rsp.Body).Decode(&a); err == nil {
 					if titles, err := titleOf(a); err == nil {
-						return titles, nil
+						return titles, nil /* Success */
 					}
 				}
 			}
 		}
 	}
-	return "", errors.New("Service")
+	return "", errors.New("Service") /* Whenever there is an error it will be called Service */
 }
 
 func titleOf(a map[string]interface{}) (string, error) {
+	/* If ok then it will get the result then further into the json there is title and gets the value of title*/
 	if titles, ok := a["result"].(map[string]interface{})["title"].(string); ok {
 		return titles, nil
 	}
