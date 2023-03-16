@@ -16,19 +16,20 @@ const (
 func ServiceAudio(mp3 string) (string, error) {
 	client := &http.Client{}
 
-	query, _ := json.Marshal(map[string]string{
+	/* Putting Audio as json and byte to put into the URI*/
+	post, _ := json.Marshal(map[string]string{
 		"Audio": mp3,
 	})
 
-	responseBody := bytes.NewBuffer(query)
+	query := bytes.NewBuffer(post)
 
-	if req, err := http.NewRequest("POST", SEARCH, responseBody); err == nil {
+	if req, err := http.NewRequest("POST", SEARCH, query); err == nil {
 		if rsp, err := client.Do(req); err == nil {
 			defer rsp.Body.Close()
 			if rsp.StatusCode == http.StatusOK {
 				var response map[string]string
 				err = json.NewDecoder(rsp.Body).Decode(&response)
-				return response["id"], nil
+				return response["id"], nil /* Gets the id this is the name of the track */
 			}
 		}
 	}
@@ -38,8 +39,10 @@ func ServiceAudio(mp3 string) (string, error) {
 func ServiceTracks(id string) (string, error) {
 	client := &http.Client{}
 
+	/* The id recieved has spaces in the string so replacing the spaces with + as that's how the full audio ids are stored*/
 	newId := strings.ReplaceAll(id, " ", "+")
 
+	/* Combine the URI with Id */
 	url := TRACKS + newId
 
 	if req, err := http.NewRequest("GET", url, nil); err == nil {
@@ -48,7 +51,7 @@ func ServiceTracks(id string) (string, error) {
 			if rsp.StatusCode == http.StatusOK {
 				var response map[string]string
 				err = json.NewDecoder(rsp.Body).Decode(&response)
-				return response["Audio"], nil
+				return response["Audio"], nil /* Outputs full audio*/
 			}
 		}
 	}
