@@ -87,7 +87,7 @@ func Delete(id string) int64 {
 		defer stmt.Close()
 		if res, err := stmt.Exec(id); err == nil {
 			if n, err := res.RowsAffected(); err == nil {
-				return n
+				return n /* Success */
 			}
 		}
 	}
@@ -98,17 +98,16 @@ func All() ([]Cell, int64) {
 	const sql = "SELECT Id FROM Cells"
 	if rows, err := repo.DB.Query(sql); err == nil {
 		defer rows.Close()
-
+		/* List of cell */
 		var cells []Cell
+		/* Loop to get each rows id and append to a list of cell */
 		for rows.Next() {
-			var cell Cell
-			err = rows.Scan(&cell.Id)
-			if err != nil {
-				return nil, -1
+			var c Cell
+			if err = rows.Scan(&c.Id); err == nil {
+				cells = append(cells, c)
 			}
-			cells = append(cells, cell)
 		}
-		return cells, 1
+		return cells, 1 /* Success */
 	}
 	return nil, -1
 }

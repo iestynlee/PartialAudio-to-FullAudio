@@ -59,7 +59,9 @@ func deleteCell(w http.ResponseWriter, r *http.Request) {
 
 func allCell(w http.ResponseWriter, r *http.Request) {
 	if c, n := repository.All(); n > 0 {
+		/* Making a list with the length of c which is ids */
 		output := make([]string, len(c))
+		/* Loop to organise the list in a way that it has first id as first inputted track into the list */
 		for i, cell := range c {
 			output[len(c)-1-i] = cell.Id
 		}
@@ -76,7 +78,7 @@ func Router() http.Handler {
 	r.HandleFunc("/tracks/{id}", updateCell).Methods("PUT")
 	/* Delete */
 	r.HandleFunc("/tracks/{id}", deleteCell).Methods("DELETE")
-	/* Document */
+	/* Read */
 	r.HandleFunc("/tracks/{id}", readCell).Methods("GET")
 	/* Read all */
 	r.HandleFunc("/tracks", allCell).Methods("GET")
